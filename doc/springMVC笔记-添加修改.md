@@ -723,6 +723,8 @@ ${msg}
 
 ![img](https://mmbiz.qpic.cn/mmbiz_png/uJDAUKrGC7IicxBZbkh0D4dJJiaXSzGEXy3eJXYyibMOnIWqqye9RYfu4zdnE5oYmxiaUHaxAnvZkVEXlyXysRMhTg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
+访问： http://localhost:8080/springmvc_03_annotation_war_exploded/mvc/hello 
+
 ![1586771920963](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586771920963.png)
 
 **OK，运行成功！**
