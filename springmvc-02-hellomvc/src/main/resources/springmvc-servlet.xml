@@ -9,6 +9,12 @@
     <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>
 
     <!--视图解析器:DispatcherServlet给他的ModelAndView-->
+    <!--    做了4件事情
+    1.获取ModelAndView的数据
+    2.解析ModelAndView的试图名字
+    3.拼接试图名字，找到对应的试图，/WEB-INF/jsp/hello.jsp
+    4.将数据渲染到这个视图
+    -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="InternalResourceViewResolver">
         <!--前缀-->
         <property name="prefix" value="/WEB-INF/jsp/"/>
