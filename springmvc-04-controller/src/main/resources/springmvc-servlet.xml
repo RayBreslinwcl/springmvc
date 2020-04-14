@@ -13,7 +13,7 @@
 
     <!--    以下是固定的-->
     <!-- 自动扫描包，让指定包下的注解生效,由IOC容器统一管理 -->
-    <context:component-scan base-package="com.ray.controller"/>
+    <context:component-scan base-package="com.ray.controller,com.ray.redirectController"/>
     <!-- 让Spring MVC不处理静态资源 -->
     <mvc:default-servlet-handler />
     <!--
