@@ -1129,13 +1129,35 @@ end
 页面 : {视图解析器前缀} + viewName +{视图解析器后缀}
 
 ```
-<!-- 视图解析器 --><bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"     id="internalResourceViewResolver">   <!-- 前缀 -->   <property name="prefix" value="/WEB-INF/jsp/" />   <!-- 后缀 -->   <property name="suffix" value=".jsp" /></bean>
+<!-- 视图解析器 -->
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+     id="internalResourceViewResolver">
+   <!-- 前缀 -->
+   <property name="prefix" value="/WEB-INF/jsp/" />
+   <!-- 后缀 -->
+   <property name="suffix" value=".jsp" />
+</bean>
 ```
 
 对应的controller类
 
 ```
-public class ControllerTest1 implements Controller {   public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {       //返回一个模型视图对象       ModelAndView mv = new ModelAndView();       mv.addObject("msg","ControllerTest1");       mv.setViewName("test");       return mv;  }}
+public class ControllerTest1 implements Controller {
+
+   public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+       //返回一个模型视图对象
+       ModelAndView mv = new ModelAndView();
+       mv.addObject("msg","ControllerTest1");
+       mv.setViewName("test");
+       return mv;
+  }
+}
+```
+
+测试：
+
+```java
+
 ```
 
 
@@ -1151,7 +1173,27 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 3、通过HttpServletResponse实现转发
 
 ```
-@Controllerpublic class ResultGo {   @RequestMapping("/result/t1")   public void test1(HttpServletRequest req, HttpServletResponse rsp) throws IOException {       rsp.getWriter().println("Hello,Spring BY servlet API");  }   @RequestMapping("/result/t2")   public void test2(HttpServletRequest req, HttpServletResponse rsp) throws IOException {       rsp.sendRedirect("/index.jsp");  }   @RequestMapping("/result/t3")   public void test3(HttpServletRequest req, HttpServletResponse rsp) throws Exception {       //转发       req.setAttribute("msg","/result/t3");       req.getRequestDispatcher("/WEB-INF/jsp/test.jsp").forward(req,rsp);  }}
+@Controller
+public class ResultGo {
+
+   @RequestMapping("/result/t1")
+   public void test1(HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+       rsp.getWriter().println("Hello,Spring BY servlet API");
+  }
+
+   @RequestMapping("/result/t2")
+   public void test2(HttpServletRequest req, HttpServletResponse rsp) throws IOException {
+       rsp.sendRedirect("/index.jsp");
+  }
+
+   @RequestMapping("/result/t3")
+   public void test3(HttpServletRequest req, HttpServletResponse rsp) throws Exception {
+       //转发
+       req.setAttribute("msg","/result/t3");
+       req.getRequestDispatcher("/WEB-INF/jsp/test.jsp").forward(req,rsp);
+  }
+
+}
 ```
 
 测试结果
@@ -1189,7 +1231,26 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 添加测试
 
 ```
-@Controllerpublic class ResultSpringMVC {   @RequestMapping("/rsm/t1")   public String test1(){       //转发       return "/index.jsp";  }   @RequestMapping("/rsm/t2")   public String test2(){       //转发二       return "forward:/index.jsp";  }   @RequestMapping("/rsm/t3")   public String test3(){       //重定向       return "redirect:/index.jsp";  }}
+@Controller
+public class ResultSpringMVC {
+   @RequestMapping("/rsm/t1")
+   public String test1(){
+       //转发
+       return "/index.jsp";
+  }
+
+   @RequestMapping("/rsm/t2")
+   public String test2(){
+       //转发二
+       return "forward:/index.jsp";
+  }
+
+   @RequestMapping("/rsm/t3")
+   public String test3(){
+       //重定向
+       return "redirect:/index.jsp";
+  }
+}
 ```
 
 
@@ -1201,7 +1262,22 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 可以重定向到另外一个请求实现 .
 
 ```
-@Controllerpublic class ResultSpringMVC2 {   @RequestMapping("/rsm2/t1")   public String test1(){       //转发       return "test";  }   @RequestMapping("/rsm2/t2")   public String test2(){       //重定向       return "redirect:/index.jsp";       //return "redirect:hello.do"; //hello.do为另一个请求/  }}
+@Controller
+public class ResultSpringMVC2 {
+   @RequestMapping("/rsm2/t1")
+   public String test1(){
+       //转发
+       return "test";
+  }
+
+   @RequestMapping("/rsm2/t2")
+   public String test2(){
+       //重定向
+       return "redirect:/index.jsp";
+       //return "redirect:hello.do"; //hello.do为另一个请求/
+  }
+
+}
 ```
 
 
@@ -1217,7 +1293,11 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 处理方法 :
 
 ```
-@RequestMapping("/hello")public String hello(String name){   System.out.println(name);   return "hello";}
+@RequestMapping("/hello")
+public String hello(String name){
+   System.out.println(name);
+   return "hello";
+}
 ```
 
 后台输出 : kuangshen
@@ -1231,7 +1311,12 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 处理方法 :
 
 ```
-//@RequestParam("username") : username提交的域的名称 .@RequestMapping("/hello")public String hello(@RequestParam("username") String name){   System.out.println(name);   return "hello";}
+//@RequestParam("username") : username提交的域的名称 .
+@RequestMapping("/hello")
+public String hello(@RequestParam("username") String name){
+   System.out.println(name);
+   return "hello";
+}
 ```
 
 后台输出 : kuangshen
@@ -1245,7 +1330,14 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 1、实体类
 
 ```
-public class User {   private int id;   private String name;   private int age;   //构造   //get/set   //tostring()}
+public class User {
+   private int id;
+   private String name;
+   private int age;
+   //构造
+   //get/set
+   //tostring()
+}
 ```
 
 2、提交数据 : http://localhost:8080/mvc04/user?name=kuangshen&id=1&age=15
@@ -1253,7 +1345,11 @@ public class User {   private int id;   private String name;   private int age; 
 3、处理方法 :
 
 ```
-@RequestMapping("/user")public String user(User user){   System.out.println(user);   return "hello";}
+@RequestMapping("/user")
+public String user(User user){
+   System.out.println(user);
+   return "hello";
+}
 ```
 
 后台输出 : User { id=1, name='kuangshen', age=15 }
@@ -1269,7 +1365,16 @@ public class User {   private int id;   private String name;   private int age; 
 我们前面一直都是如此 . 就不过多解释
 
 ```
-public class ControllerTest1 implements Controller {   public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {       //返回一个模型视图对象       ModelAndView mv = new ModelAndView();       mv.addObject("msg","ControllerTest1");       mv.setViewName("test");       return mv;  }}
+public class ControllerTest1 implements Controller {
+
+   public ModelAndView handleRequest(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+       //返回一个模型视图对象
+       ModelAndView mv = new ModelAndView();
+       mv.addObject("msg","ControllerTest1");
+       mv.setViewName("test");
+       return mv;
+  }
+}
 ```
 
 
@@ -1279,7 +1384,14 @@ public class ControllerTest1 implements Controller {   public ModelAndView handl
 ModelMap
 
 ```
-@RequestMapping("/hello")public String hello(@RequestParam("username") String name, ModelMap model){   //封装要显示到视图中的数据   //相当于req.setAttribute("name",name);   model.addAttribute("name",name);   System.out.println(name);   return "hello";}
+@RequestMapping("/hello")
+public String hello(@RequestParam("username") String name, ModelMap model){
+   //封装要显示到视图中的数据
+   //相当于req.setAttribute("name",name);
+   model.addAttribute("name",name);
+   System.out.println(name);
+   return "hello";
+}
 ```
 
 
@@ -1289,7 +1401,14 @@ ModelMap
 Model
 
 ```
-@RequestMapping("/ct2/hello")public String hello(@RequestParam("username") String name, Model model){   //封装要显示到视图中的数据   //相当于req.setAttribute("name",name);   model.addAttribute("msg",name);   System.out.println(name);   return "test";}
+@RequestMapping("/ct2/hello")
+public String hello(@RequestParam("username") String name, Model model){
+   //封装要显示到视图中的数据
+   //相当于req.setAttribute("name",name);
+   model.addAttribute("msg",name);
+   System.out.println(name);
+   return "test";
+}
 ```
 
 
@@ -1299,7 +1418,8 @@ Model
 就对于新手而言简单来说使用区别就是：
 
 ```
-Model 只有寥寥几个方法只适合用于储存数据，简化了新手对于Model对象的操作和理解；ModelMap 继承了 LinkedMap ，除了实现了自身的一些方法，同样的继承 LinkedMap 的方法和特性；ModelAndView 可以在储存数据的同时，可以进行设置返回的逻辑视图，进行控制展示层的跳转。
+Model 只有寥寥几个方法只适合用于储存数据，简化了新手对于Model对象的操作和理解；
+ModelMap 继承了 LinkedMap ，除了实现了自身的一些方法，同样的继承 LinkedMap 的方法和特性；ModelAndView 可以在储存数据的同时，可以进行设置返回的逻辑视图，进行控制展示层的跳转。
 ```
 
 当然更多的以后开发考虑的更多的是性能和优化，就不能单单仅限于此的了解。
@@ -1308,25 +1428,70 @@ Model 只有寥寥几个方法只适合用于储存数据，简化了新手对�
 
 
 
-### 乱码问题
+### 4.3 【***】返回数据乱码问题
 
 测试步骤：
 
-1、我们可以在首页编写一个提交的表单
+1、我们可以在首页编写一个提交的表单form.jsp
+
+在web目录下，而不是WEB-INF目录下创建
+
+![1586829586297](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586829586297.png)
 
 ```
-<form action="/e/t" method="post"> <input type="text" name="name"> <input type="submit"></form>
+<%--
+  Created by IntelliJ IDEA.
+  User: Lenovo
+  Date: 2020/4/13
+  Time: 22:04
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>表单</title>
+</head>
+<body>
+
+<form action="/e/t" method="post">
+    <input type="text" name="name">
+    <input type="submit">
+</form>
+
+</body>
+</html>
+
 ```
 
 2、后台编写对应的处理类
 
-```
-@Controllerpublic class Encoding {   @RequestMapping("/e/t")   public String test(Model model,String name){       model.addAttribute("msg",name); //获取表单提交的值       return "test"; //跳转到test页面显示输入的值  }}
+```java
+package com.ray.redirectController;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class Encoding {
+   @RequestMapping("/e/t")
+   public String test(Model model, String name){
+       model.addAttribute("msg",name); //获取表单提交的值
+       return "test"; //跳转到test页面显示输入的值
+  }
+}
+
 ```
 
 3、输入中文测试，发现乱码
 
-![img](data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==)
+![1586829628431](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586829628431.png)
+
+点击提交后，为乱码
+
+![1586829645327](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586829645327.png)
+
+
 
 不得不说，乱码问题是在我们开发中十分常见的问题，也是让我们程序猿比较头大的问题！
 
@@ -1334,13 +1499,33 @@ Model 只有寥寥几个方法只适合用于储存数据，简化了新手对�
 
 修改了xml文件需要重启服务器！
 
+```xml
+<!--    乱码过滤器【推荐使用！！！】-->
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>utf-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 ```
-<filter>   <filter-name>encoding</filter-name>   <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>   <init-param>       <param-name>encoding</param-name>       <param-value>utf-8</param-value>   </init-param></filter><filter-mapping>   <filter-name>encoding</filter-name>   <url-pattern>/*</url-pattern></filter-mapping>
-```
+
+测试可以
+
+![1586829762375](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586829762375.png)
+
+提交后
+
+![1586829770638](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586829770638.png)
 
 但是我们发现 , 有些极端情况下.这个过滤器对get的支持不好 .
 
-处理方法 :
+**处理方法 :**
 
 1、修改tomcat配置文件 ：设置编码！
 
@@ -1351,12 +1536,144 @@ Model 只有寥寥几个方法只适合用于储存数据，简化了新手对�
 2、自定义过滤器
 
 ```
-package com.kuang.filter;import javax.servlet.*;import javax.servlet.http.HttpServletRequest;import javax.servlet.http.HttpServletRequestWrapper;import javax.servlet.http.HttpServletResponse;import java.io.IOException;import java.io.UnsupportedEncodingException;import java.util.Map;/*** 解决get和post请求 全部乱码的过滤器*/public class GenericEncodingFilter implements Filter {   @Override   public void destroy() {  }   @Override   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {       //处理response的字符编码       HttpServletResponse myResponse=(HttpServletResponse) response;       myResponse.setContentType("text/html;charset=UTF-8");       // 转型为与协议相关对象       HttpServletRequest httpServletRequest = (HttpServletRequest) request;       // 对request包装增强       HttpServletRequest myrequest = new MyRequest(httpServletRequest);       chain.doFilter(myrequest, response);  }   @Override   public void init(FilterConfig filterConfig) throws ServletException {  }}//自定义request对象，HttpServletRequest的包装类class MyRequest extends HttpServletRequestWrapper {   private HttpServletRequest request;   //是否编码的标记   private boolean hasEncode;   //定义一个可以传入HttpServletRequest对象的构造函数，以便对其进行装饰   public MyRequest(HttpServletRequest request) {       super(request);// super必须写       this.request = request;  }   // 对需要增强方法 进行覆盖   @Override   public Map getParameterMap() {       // 先获得请求方式       String method = request.getMethod();       if (method.equalsIgnoreCase("post")) {           // post请求           try {               // 处理post乱码               request.setCharacterEncoding("utf-8");               return request.getParameterMap();          } catch (UnsupportedEncodingException e) {               e.printStackTrace();          }      } else if (method.equalsIgnoreCase("get")) {           // get请求           Map<String, String[]> parameterMap = request.getParameterMap();           if (!hasEncode) { // 确保get手动编码逻辑只运行一次               for (String parameterName : parameterMap.keySet()) {                   String[] values = parameterMap.get(parameterName);                   if (values != null) {                       for (int i = 0; i < values.length; i++) {                           try {                               // 处理get乱码                               values[i] = new String(values[i]                                      .getBytes("ISO-8859-1"), "utf-8");                          } catch (UnsupportedEncodingException e) {                               e.printStackTrace();                          }                      }                  }              }               hasEncode = true;          }           return parameterMap;      }       return super.getParameterMap();  }   //取一个值   @Override   public String getParameter(String name) {       Map<String, String[]> parameterMap = getParameterMap();       String[] values = parameterMap.get(name);       if (values == null) {           return null;      }       return values[0]; // 取回参数的第一个值  }   //取所有值   @Override   public String[] getParameterValues(String name) {       Map<String, String[]> parameterMap = getParameterMap();       String[] values = parameterMap.get(name);       return values;  }}
+package com.ray.filter;
+
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+/**
+* 解决get和post请求 全部乱码的过滤器
+*/
+public class GenericEncodingFilter implements Filter {
+
+
+   public void destroy() {
+  }
+
+
+   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+       //处理response的字符编码
+       HttpServletResponse myResponse=(HttpServletResponse) response;
+       myResponse.setContentType("text/html;charset=UTF-8");
+
+       // 转型为与协议相关对象
+       HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+       // 对request包装增强
+       HttpServletRequest myrequest = new MyRequest(httpServletRequest);
+       chain.doFilter(myrequest, response);
+  }
+
+   public void init(FilterConfig filterConfig) throws ServletException {
+  }
+
+}
+
+//自定义request对象，HttpServletRequest的包装类
+class MyRequest extends HttpServletRequestWrapper {
+
+   private HttpServletRequest request;
+   //是否编码的标记
+   private boolean hasEncode;
+   //定义一个可以传入HttpServletRequest对象的构造函数，以便对其进行装饰
+   public MyRequest(HttpServletRequest request) {
+       super(request);// super必须写
+       this.request = request;
+  }
+
+   // 对需要增强方法 进行覆盖
+   @Override
+   public Map getParameterMap() {
+       // 先获得请求方式
+       String method = request.getMethod();
+       if (method.equalsIgnoreCase("post")) {
+           // post请求
+           try {
+               // 处理post乱码
+               request.setCharacterEncoding("utf-8");
+               return request.getParameterMap();
+          } catch (UnsupportedEncodingException e) {
+               e.printStackTrace();
+          }
+      } else if (method.equalsIgnoreCase("get")) {
+           // get请求
+           Map<String, String[]> parameterMap = request.getParameterMap();
+           if (!hasEncode) { // 确保get手动编码逻辑只运行一次
+               for (String parameterName : parameterMap.keySet()) {
+                   String[] values = parameterMap.get(parameterName);
+                   if (values != null) {
+                       for (int i = 0; i < values.length; i++) {
+                           try {
+                               // 处理get乱码
+                               values[i] = new String(values[i]
+                                      .getBytes("ISO-8859-1"), "utf-8");
+                          } catch (UnsupportedEncodingException e) {
+                               e.printStackTrace();
+                          }
+                      }
+                  }
+              }
+               hasEncode = true;
+          }
+           return parameterMap;
+      }
+       return super.getParameterMap();
+  }
+
+   //取一个值
+   @Override
+   public String getParameter(String name) {
+       Map<String, String[]> parameterMap = getParameterMap();
+       String[] values = parameterMap.get(name);
+       if (values == null) {
+           return null;
+      }
+       return values[0]; // 取回参数的第一个值
+  }
+
+   //取所有值
+   @Override
+   public String[] getParameterValues(String name) {
+       Map<String, String[]> parameterMap = getParameterMap();
+       String[] values = parameterMap.get(name);
+       return values;
+  }
+}
+
 ```
 
 这个也是我在网上找的一些大神写的，一般情况下，SpringMVC默认的乱码处理就已经能够很好的解决了！
 
 **然后在web.xml中配置这个过滤器即可！**
+
+```xml
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>com.ray.filter.GenericEncodingFilter</filter-class>
+<!--        <init-param>-->
+<!--            <param-name>encoding</param-name>-->
+<!--            <param-value>utf-8</param-value>-->
+<!--        </init-param>-->
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+```
+
+
+
+然后测试： http://localhost:8080/form.jsp 
+
+![1586830144796](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586830144796.png)
+
+结果是ok的
+
+![1586830159671](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1586830159671.png)
 
 乱码问题，需要平时多注意，在尽可能能设置编码的地方，都设置为统一编码 UTF-8！
 
