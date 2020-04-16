@@ -2436,19 +2436,72 @@ springmvc-servlet.xml
 3、编写一个拦截器
 
 ```
-package com.kuang.interceptor;import org.springframework.web.servlet.HandlerInterceptor;import org.springframework.web.servlet.ModelAndView;import javax.servlet.http.HttpServletRequest;import javax.servlet.http.HttpServletResponse;public class MyInterceptor implements HandlerInterceptor {   //在请求处理的方法之前执行   //如果返回true执行下一个拦截器   //如果返回false就不执行下一个拦截器   public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {       System.out.println("------------处理前------------");       return true;  }   //在请求处理方法执行之后执行   public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {       System.out.println("------------处理后------------");  }   //在dispatcherServlet处理后执行,做清理工作.   public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {       System.out.println("------------清理------------");  }}
+package com.kuang.interceptor;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class MyInterceptor implements HandlerInterceptor {
+
+   //在请求处理的方法之前执行
+   //如果返回true执行下一个拦截器
+   //如果返回false就不执行下一个拦截器
+   public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
+       System.out.println("------------处理前------------");
+       return true;
+  }
+
+   //在请求处理方法执行之后执行
+   public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+       System.out.println("------------处理后------------");
+  }
+
+   //在dispatcherServlet处理后执行,做清理工作.
+   public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
+       System.out.println("------------清理------------");
+  }
+}
 ```
 
 4、在springmvc的配置文件中配置拦截器
 
 ```
-<!--关于拦截器的配置--><mvc:interceptors>   <mvc:interceptor>       <!--/** 包括路径及其子路径-->       <!--/admin/* 拦截的是/admin/add等等这种 , /admin/add/user不会被拦截-->       <!--/admin/** 拦截的是/admin/下的所有-->       <mvc:mapping path="/**"/>       <!--bean配置的就是拦截器-->       <bean class="com.kuang.interceptor.MyInterceptor"/>   </mvc:interceptor></mvc:interceptors>
+<!--关于拦截器的配置-->
+<mvc:interceptors>
+   <mvc:interceptor>
+       <!--/** 包括路径及其子路径-->
+       <!--/admin/* 拦截的是/admin/add等等这种 , /admin/add/user不会被拦截-->
+       <!--/admin/** 拦截的是/admin/下的所有-->
+       <mvc:mapping path="/**"/>
+       <!--bean配置的就是拦截器-->
+       <bean class="com.kuang.interceptor.MyInterceptor"/>
+   </mvc:interceptor>
+</mvc:interceptors>
 ```
 
 5、编写一个Controller，接收请求
 
 ```
-package com.kuang.controller;import org.springframework.stereotype.Controller;import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.ResponseBody;//测试拦截器的控制器@Controllerpublic class InterceptorController {   @RequestMapping("/interceptor")   @ResponseBody   public String testFunction() {       System.out.println("控制器中的方法执行了");       return "hello";  }}
+package com.kuang.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+//测试拦截器的控制器
+@Controller
+public class InterceptorController {
+
+   @RequestMapping("/interceptor")
+   @ResponseBody
+   public String testFunction() {
+       System.out.println("控制器中的方法执行了");
+       return "hello";
+  }
+}
 ```
 
 6、前端 index.jsp
@@ -2738,6 +2791,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 ## 3.文件上传和下载
 
+### 准备工作
+
 > 准备工作
 
 文件上传是项目开发中最常见的功能之一 ,springMVC 可以很好的支持文件上传，但是SpringMVC上下文中默认没有装配MultipartResolver，因此默认情况下其不能处理文件上传工作。如果想使用Spring的文件上传功能，则需要在上下文中配置MultipartResolver。
@@ -2751,7 +2806,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 - text/plain：除了把空格转换为 "+" 号外，其他字符都不做编码处理，这种方式适用直接通过表单发送邮件。
 
 ```
-<form action="" enctype="multipart/form-data" method="post">   <input type="file" name="file"/>   <input type="submit"></form>
+<form action="" enctype="multipart/form-data" method="post">
+   <input type="file" name="file"/>
+   <input type="submit">
+</form>
 ```
 
 一旦设置了enctype为multipart/form-data，浏览器即会采用二进制流的方式来处理表单数据，而对于文件上传的处理则涉及在服务器端解析原始的HTTP响应。在2003年，Apache Software Foundation发布了开源的Commons FileUpload组件，其很快成为Servlet/JSP程序员上传文件的最佳选择。
@@ -2762,22 +2820,50 @@ public class LoginInterceptor implements HandlerInterceptor {
 - Spring MVC使用Apache Commons FileUpload技术实现了一个MultipartResolver实现类：
 - CommonsMultipartResolver。因此，SpringMVC的文件上传还需要依赖Apache Commons FileUpload的组件。
 
+### 文件上传
 
+#### 上传方式一
 
 > 文件上传
 
 1、导入文件上传的jar包，commons-fileupload ， Maven会自动帮我们导入他的依赖包 commons-io包；
 
 ```
-<!--文件上传--><dependency>   <groupId>commons-fileupload</groupId>   <artifactId>commons-fileupload</artifactId>   <version>1.3.3</version></dependency><!--servlet-api导入高版本的--><dependency>   <groupId>javax.servlet</groupId>   <artifactId>javax.servlet-api</artifactId>   <version>4.0.1</version></dependency>
+    <dependencies>
+        <!--文件上传-->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.3.3</version>
+        </dependency>
+        <!--servlet-api导入高版本的-->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+    </dependencies>
 ```
+
+注意添加依赖后，重新导入包到lib目录下
+
+![1587046458544](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587046458544.png)
+
+
 
 2、配置bean：multipartResolver
 
 【**注意！！！这个bena的id必须为：multipartResolver ， 否则上传文件会报400的错误！在这里栽过坑,教训！**】
 
 ```
-<!--文件上传配置--><bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">   <!-- 请求的编码格式，必须和jSP的pageEncoding属性一致，以便正确读取表单的内容，默认为ISO-8859-1 -->   <property name="defaultEncoding" value="utf-8"/>   <!-- 上传文件大小上限，单位为字节（10485760=10M） -->   <property name="maxUploadSize" value="10485760"/>   <property name="maxInMemorySize" value="40960"/></bean>
+<!--文件上传配置-->
+<bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+   <!-- 请求的编码格式，必须和jSP的pageEncoding属性一致，以便正确读取表单的内容，默认为ISO-8859-1 -->
+   <property name="defaultEncoding" value="utf-8"/>
+   <!-- 上传文件大小上限，单位为字节（10485760=10M） -->
+   <property name="maxUploadSize" value="10485760"/>
+   <property name="maxInMemorySize" value="40960"/>
+</bean>
 ```
 
 CommonsMultipartFile 的 常用方法：
@@ -2791,34 +2877,109 @@ CommonsMultipartFile 的 常用方法：
 3、编写前端页面
 
 ```
-<form action="/upload" enctype="multipart/form-data" method="post"> <input type="file" name="file"/> <input type="submit" value="upload"></form>
+<form action="/upload" enctype="multipart/form-data" method="post">
+ <input type="file" name="file"/>
+ <input type="submit" value="upload">
+</form>
 ```
 
 4、**Controller**
 
 ```
-package com.kuang.controller;import org.springframework.stereotype.Controller;import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.RequestParam;import org.springframework.web.multipart.commons.CommonsMultipartFile;import javax.servlet.http.HttpServletRequest;import java.io.*;@Controllerpublic class FileController {   //@RequestParam("file") 将name=file控件得到的文件封装成CommonsMultipartFile 对象   //批量上传CommonsMultipartFile则为数组即可   @RequestMapping("/upload")   public String fileUpload(@RequestParam("file") CommonsMultipartFile file , HttpServletRequest request) throws IOException {       //获取文件名 : file.getOriginalFilename();       String uploadFileName = file.getOriginalFilename();       //如果文件名为空，直接回到首页！       if ("".equals(uploadFileName)){           return "redirect:/index.jsp";      }       System.out.println("上传文件名 : "+uploadFileName);       //上传路径保存设置       String path = request.getServletContext().getRealPath("/upload");       //如果路径不存在，创建一个       File realPath = new File(path);       if (!realPath.exists()){           realPath.mkdir();      }       System.out.println("上传文件保存地址："+realPath);       InputStream is = file.getInputStream(); //文件输入流       OutputStream os = new FileOutputStream(new File(realPath,uploadFileName)); //文件输出流       //读取写出       int len=0;       byte[] buffer = new byte[1024];       while ((len=is.read(buffer))!=-1){           os.write(buffer,0,len);           os.flush();      }       os.close();       is.close();       return "redirect:/index.jsp";  }}
+package com.kuang.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
+
+@Controller
+public class FileController {
+   //@RequestParam("file") 将name=file控件得到的文件封装成CommonsMultipartFile 对象
+   //批量上传CommonsMultipartFile则为数组即可
+   @RequestMapping("/upload")
+   public String fileUpload(@RequestParam("file") CommonsMultipartFile file , HttpServletRequest request) throws IOException {
+
+       //获取文件名 : file.getOriginalFilename();
+       String uploadFileName = file.getOriginalFilename();
+
+       //如果文件名为空，直接回到首页！
+       if ("".equals(uploadFileName)){
+           return "redirect:/index.jsp";
+      }
+       System.out.println("上传文件名 : "+uploadFileName);
+
+       //上传路径保存设置
+       String path = request.getServletContext().getRealPath("/upload");
+       //如果路径不存在，创建一个
+       File realPath = new File(path);
+       if (!realPath.exists()){
+           realPath.mkdir();
+      }
+       System.out.println("上传文件保存地址："+realPath);
+
+       InputStream is = file.getInputStream(); //文件输入流
+       OutputStream os = new FileOutputStream(new File(realPath,uploadFileName)); //文件输出流
+
+       //读取写出
+       int len=0;
+       byte[] buffer = new byte[1024];
+       while ((len=is.read(buffer))!=-1){
+           os.write(buffer,0,len);
+           os.flush();
+      }
+       os.close();
+       is.close();
+       return "redirect:/index.jsp";
+  }
+}
 ```
 
 5、测试上传文件，OK！
 
 
 
-**采用file.Transto 来保存上传的文件**
+#### **上传方式二：采用file.Transto 来保存上传的文件**
 
 1、编写Controller
 
 ```
-/** 采用file.Transto 来保存上传的文件*/@RequestMapping("/upload2")public String  fileUpload2(@RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) throws IOException {   //上传路径保存设置   String path = request.getServletContext().getRealPath("/upload");   File realPath = new File(path);   if (!realPath.exists()){       realPath.mkdir();  }   //上传文件地址   System.out.println("上传文件保存地址："+realPath);   //通过CommonsMultipartFile的方法直接写文件（注意这个时候）   file.transferTo(new File(realPath +"/"+ file.getOriginalFilename()));   return "redirect:/index.jsp";}
+/*
+* 采用file.Transto 来保存上传的文件
+*/
+@RequestMapping("/upload2")
+public String  fileUpload2(@RequestParam("file") CommonsMultipartFile file, HttpServletRequest request) throws IOException {
+
+   //上传路径保存设置
+   String path = request.getServletContext().getRealPath("/upload");
+   File realPath = new File(path);
+   if (!realPath.exists()){
+       realPath.mkdir();
+  }
+   //上传文件地址
+   System.out.println("上传文件保存地址："+realPath);
+
+   //通过CommonsMultipartFile的方法直接写文件（注意这个时候）
+   file.transferTo(new File(realPath +"/"+ file.getOriginalFilename()));
+
+   return "redirect:/index.jsp";
+}
 ```
 
 2、前端表单提交地址修改
 
 3、访问提交测试，OK！
 
+没问题！
 
+![1587047724832](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587047724832.png)
 
 > 文件下载
+
+### 文件下载
 
 **文件下载步骤：**
 
@@ -2835,13 +2996,51 @@ package com.kuang.controller;import org.springframework.stereotype.Controller;im
 **代码实现：**
 
 ```
-@RequestMapping(value="/download")public String downloads(HttpServletResponse response ,HttpServletRequest request) throws Exception{   //要下载的图片地址   String  path = request.getServletContext().getRealPath("/upload");   String  fileName = "基础语法.jpg";   //1、设置response 响应头   response.reset(); //设置页面不缓存,清空buffer   response.setCharacterEncoding("UTF-8"); //字符编码   response.setContentType("multipart/form-data"); //二进制传输数据   //设置响应头   response.setHeader("Content-Disposition",           "attachment;fileName="+URLEncoder.encode(fileName, "UTF-8"));   File file = new File(path,fileName);   //2、 读取文件--输入流   InputStream input=new FileInputStream(file);   //3、 写出文件--输出流   OutputStream out = response.getOutputStream();   byte[] buff =new byte[1024];   int index=0;   //4、执行 写出操作   while((index= input.read(buff))!= -1){       out.write(buff, 0, index);       out.flush();  }   out.close();   input.close();   return null;}
+@RequestMapping(value="/download")
+public String downloads(HttpServletResponse response ,HttpServletRequest request) throws Exception{
+   //要下载的图片地址
+   String  path = request.getServletContext().getRealPath("/upload");
+   String  fileName = "基础语法.jpg";
+
+   //1、设置response 响应头
+   response.reset(); //设置页面不缓存,清空buffer
+   response.setCharacterEncoding("UTF-8"); //字符编码
+   response.setContentType("multipart/form-data"); //二进制传输数据
+   //设置响应头
+   response.setHeader("Content-Disposition",
+           "attachment;fileName="+URLEncoder.encode(fileName, "UTF-8"));
+
+   File file = new File(path,fileName);
+   //2、 读取文件--输入流
+   InputStream input=new FileInputStream(file);
+   //3、 写出文件--输出流
+   OutputStream out = response.getOutputStream();
+
+   byte[] buff =new byte[1024];
+   int index=0;
+   //4、执行 写出操作
+   while((index= input.read(buff))!= -1){
+       out.write(buff, 0, index);
+       out.flush();
+  }
+   out.close();
+   input.close();
+   return null;
+}
 ```
+
+注意代码中的下载文件位置
+
+![1587048843673](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587048843673.png)
 
 前端
 
-```
+```xml
 <a href="/download">点击下载</a>
 ```
 
 测试，文件下载OK，大家可以和我们之前学习的JavaWeb原生的方式对比一下，就可以知道这个便捷多了!
+
+测试成功
+
+![1587049034194](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587049034194.png)
