@@ -13,7 +13,7 @@ public class MyInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o) throws Exception {
         System.out.println("------------处理前------------");
 //        return true;
-        return false;
+        return true;
     }
 
     //在请求处理方法执行之后执行

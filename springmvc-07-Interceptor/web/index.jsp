@@ -11,7 +11,13 @@
     <title>$Title$</title>
   </head>
   <body>
+  <h1>首页</h1>
   $END$
     <a href="${pageContext.request.contextPath}/interceptor">拦截器测试</a>
+
+  以下是登陆测试
+  <%--登录--%>
+  <a href="${pageContext.request.contextPath}/user/jumplogin">登录</a>
+  <a href="${pageContext.request.contextPath}/user/jumpSuccess">成功页面</a>
   </body>
 </html>

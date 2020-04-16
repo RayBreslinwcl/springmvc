@@ -2527,7 +2527,7 @@ public class MyInterceptor implements HandlerInterceptor {
 
 
 
-## 2.验证用户是否登录 (认证用户)
+## 2.验证用户是否登录 (认证用户)[springmvc-07-interceptor中]
 
 > 验证用户是否登录 (认证用户)
 
@@ -2539,55 +2539,204 @@ public class MyInterceptor implements HandlerInterceptor {
 
 3、拦截用户请求，判断用户是否登陆。如果用户已经登陆。放行， 如果用户未登陆，跳转到登陆页面
 
+整体流程图如下
+
+![1587044699030](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587044699030.png)
+
 **测试：**
 
 1、编写一个登陆页面  login.jsp
 
 ```
-<%@ page contentType="text/html;charset=UTF-8" language="java" %><html><head>   <title>Title</title></head><h1>登录页面</h1><hr><body><form action="${pageContext.request.contextPath}/user/login">  用户名：<input type="text" name="username"> <br>  密码：<input type="password" name="pwd"> <br>   <input type="submit" value="提交"></form></body></html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+   <title>Title</title>
+</head>
+
+<h1>登录页面</h1>
+<hr>
+
+<body>
+<form action="${pageContext.request.contextPath}/user/login">
+  用户名：<input type="text" name="username"> <br>
+  密码：<input type="password" name="pwd"> <br>
+   <input type="submit" value="提交">
+</form>
+</body>
+</html>
 ```
 
 2、编写一个Controller处理请求
 
 ```
-package com.kuang.controller;import org.springframework.stereotype.Controller;import org.springframework.web.bind.annotation.RequestMapping;import javax.servlet.http.HttpSession;@Controller@RequestMapping("/user")public class UserController {   //跳转到登陆页面   @RequestMapping("/jumplogin")   public String jumpLogin() throws Exception {       return "login";  }   //跳转到成功页面   @RequestMapping("/jumpSuccess")   public String jumpSuccess() throws Exception {       return "success";  }   //登陆提交   @RequestMapping("/login")   public String login(HttpSession session, String username, String pwd) throws Exception {       // 向session记录用户身份信息       System.out.println("接收前端==="+username);       session.setAttribute("user", username);       return "success";  }   //退出登陆   @RequestMapping("logout")   public String logout(HttpSession session) throws Exception {       // session 过期       session.invalidate();       return "login";  }}
+package com.ray.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpSession;
+
+@Controller
+@RequestMapping("/user")
+public class UserController {
+
+   //跳转到登陆页面
+   @RequestMapping("/jumplogin")
+   public String jumpLogin() throws Exception {
+       return "login";
+  }
+
+   //跳转到成功页面
+   @RequestMapping("/jumpSuccess")
+   public String jumpSuccess() throws Exception {
+       return "success";
+  }
+
+   //登陆提交
+   @RequestMapping("/login")
+   public String login(HttpSession session, String username, String pwd) throws Exception {
+       // 向session记录用户身份信息
+       System.out.println("接收前端==="+username);
+       session.setAttribute("user", username);
+       return "success";
+  }
+
+   //退出登陆
+   @RequestMapping("logout")
+   public String logout(HttpSession session) throws Exception {
+       // session 过期
+       session.invalidate();
+       return "login";
+  }
+}
+
 ```
 
 3、编写一个登陆成功的页面 success.jsp
 
 ```
-<%@ page contentType="text/html;charset=UTF-8" language="java" %><html><head>   <title>Title</title></head><body><h1>登录成功页面</h1><hr>${user}<a href="${pageContext.request.contextPath}/user/logout">注销</a></body></html>
+<%--
+  Created by IntelliJ IDEA.
+  User: Lenovo
+  Date: 2020/4/16
+  Time: 15:15
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+
+<h1>登录成功页面</h1>
+<hr>
+
+${user}
+<a href="${pageContext.request.contextPath}/user/logout">注销</a>
+
+</body>
+</html>
+
 ```
 
 4、在 index 页面上测试跳转！启动Tomcat 测试，未登录也可以进入主页！
 
 ```
-<%@ page contentType="text/html;charset=UTF-8" language="java" %><html> <head>   <title>$Title$</title> </head> <body> <h1>首页</h1> <hr><%--登录--%> <a href="${pageContext.request.contextPath}/user/jumplogin">登录</a> <a href="${pageContext.request.contextPath}/user/jumpSuccess">成功页面</a> </body></html>
+<%--
+  Created by IntelliJ IDEA.
+  User: Lenovo
+  Date: 2020/4/16
+  Time: 8:36
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+  <head>
+    <title>$Title$</title>
+  </head>
+  <body>
+  <h1>首页</h1>
+  $END$
+    <a href="${pageContext.request.contextPath}/interceptor">拦截器测试</a>
+
+  以下是登陆测试
+  <%--登录--%>
+  <a href="${pageContext.request.contextPath}/user/jumplogin">登录</a>
+  <a href="${pageContext.request.contextPath}/user/jumpSuccess">成功页面</a>
+  </body>
+</html>
+
 ```
 
 5、编写用户登录拦截器
 
 ```
-package com.kuang.interceptor;import org.springframework.web.servlet.HandlerInterceptor;import org.springframework.web.servlet.ModelAndView;import javax.servlet.ServletException;import javax.servlet.http.HttpServletRequest;import javax.servlet.http.HttpServletResponse;import javax.servlet.http.HttpSession;import java.io.IOException;public class LoginInterceptor implements HandlerInterceptor {   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException, IOException {       // 如果是登陆页面则放行       System.out.println("uri: " + request.getRequestURI());       if (request.getRequestURI().contains("login")) {           return true;      }       HttpSession session = request.getSession();       // 如果用户已登陆也放行       if(session.getAttribute("user") != null) {           return true;      }       // 用户没有登陆跳转到登陆页面       request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);       return false;  }   public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {  }      public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {  }}
+package com.ray.interceptor;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+
+public class LoginInterceptor implements HandlerInterceptor {
+
+   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws ServletException, IOException {
+       // 如果是登陆页面则放行
+       System.out.println("uri: " + request.getRequestURI());
+       if (request.getRequestURI().contains("login")) {
+           return true;
+      }
+
+       HttpSession session = request.getSession();
+
+       // 如果用户已登陆也放行
+       if(session.getAttribute("user") != null) {
+           return true;
+      }
+
+       // 用户没有登陆跳转到登陆页面
+       request.getRequestDispatcher("/WEB-INF/jsp/login.jsp").forward(request, response);
+       return false;
+  }
+
+   public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+
+  }
+
+   public void afterCompletion(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) throws Exception {
+
+  }
+}
+
 ```
 
 6、在Springmvc的配置文件中注册拦截器
 
 ```
-<!--关于拦截器的配置--><mvc:interceptors>   <mvc:interceptor>       <mvc:mapping path="/**"/>       <bean id="loginInterceptor" class="com.kuang.interceptor.LoginInterceptor"/>   </mvc:interceptor></mvc:interceptors>
+        <!--登陆拦截器-->
+        <mvc:interceptor>
+            <mvc:mapping path="/user/**"/>
+            <bean id="loginInterceptor" class="com.ray.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
 ```
 
 7、再次重启Tomcat测试！
 
 **OK，测试登录拦截功能无误.**
 
+![1587044815908](E:\02LocalProject\springmvc\doc\springMVC笔记-添加修改.assets\1587044815908.png)
 
 
 
 
 
-
-文件上传和下载
+## 3.文件上传和下载
 
 > 准备工作
 

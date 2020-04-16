@@ -48,6 +48,13 @@
             <!--bean配置的就是拦截器-->
             <bean class="com.ray.interceptor.MyInterceptor"/>
         </mvc:interceptor>
+
+
+        <!--登陆拦截器-->
+        <mvc:interceptor>
+            <mvc:mapping path="/user/**"/>
+            <bean id="loginInterceptor" class="com.ray.interceptor.LoginInterceptor"/>
+        </mvc:interceptor>
     </mvc:interceptors>
 
 </beans>
